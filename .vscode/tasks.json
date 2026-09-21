@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Tests",
+      "type": "shell",
+      "command": "python -m pytest -q",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint (ruff + mypy)",
+      "type": "shell",
+      "command": "ruff check . && mypy",
+      "problemMatcher": []
+    },
+    {
+      "label": "Fuzz (1M inputs)",
+      "type": "shell",
+      "command": "python tools/fuzz.py --cases 1000000 --jobs 8",
+      "problemMatcher": []
+    },
+    {
+      "label": "Rebuild the demo capture and screenshot",
+      "type": "shell",
+      "command": "python tools/make_demo.py && python tools/render_screenshot.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "Compare against tshark",
+      "type": "shell",
+      "command": "python tools/compare_tshark.py",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "unspool summary (demo capture)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unspool",
+      "args": ["summary", "examples/demo.pcapng"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "unspool packets (demo capture)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unspool",
+      "args": ["packets", "examples/demo.pcapng", "-c", "20"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "unspool blocks (demo capture)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unspool",
+      "args": ["blocks", "examples/demo.pcapng"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "unspool <file> (prompt for a capture)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unspool",
+      "args": ["${input:command}", "${input:capture}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+    },
+    {
+      "name": "Fuzz (100k inputs)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "tools/fuzz.py",
+      "args": ["--cases", "100000", "--jobs", "4"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Compare against tshark",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "tools/compare_tshark.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "command",
+      "type": "pickString",
+      "description": "unspool subcommand",
+      "options": ["summary", "packets", "blocks", "dns", "tls", "http"],
+      "default": "summary"
+    },
+    {
+      "id": "capture",
+      "type": "promptString",
+      "description": "Path to a .pcap or .pcapng file",
+      "default": "examples/demo.pcapng"
+    }
+  ]
+}

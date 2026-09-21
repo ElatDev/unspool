@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "unspool"
+version = "0.1.0"
+description = "A pure-Python pcapng parser and protocol decoder. Parse-only: no capture, no drivers, no privileges."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Walter Marshall" }]
+keywords = ["pcapng", "pcap", "packet", "parser", "dns", "tls", "http", "network", "ja4"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: System :: Networking :: Monitoring",
+    "Topic :: Security",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
+
+[project.scripts]
+unspool = "unspool.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/unspool"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "tools", "examples", "docs", "compat", "README.md", "LICENSE", "CHANGELOG.md", "AUDIT.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RET", "A", "PTH", "RUF"]
+ignore = [
+    "SIM108",  # ternaries are not always clearer
+    "RET504",  # a named result before return often documents it
+    "B905",    # zip(strict=) is 3.10+; call sites here are known-equal length
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+# `unspool.open` is the public entry point, named after gzip.open and tarfile.open.
+"src/unspool/capture.py" = ["A001", "SIM115"]  # the Capture owns the handle it opens
+"src/unspool/__init__.py" = ["A004"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/unspool"]
+warn_unused_ignores = false
+
+[tool.pyright]
+include = ["src", "tests", "tools"]
+extraPaths = ["src"]

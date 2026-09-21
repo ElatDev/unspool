@@ -1,0 +1,20 @@
+{
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.extraPaths": ["src"],
+  "python.analysis.autoImportCompletions": true,
+  "editor.rulers": [100],
+  "editor.formatOnSave": false,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.mypy_cache": true
+  },
+  "files.watcherExclude": { "**/.cache/**": true },
+  "search.exclude": { ".cache": true, "compat/results.json": true },
+  "[python]": { "editor.tabSize": 4, "editor.insertSpaces": true },
+  "ruff.enable": true
+}

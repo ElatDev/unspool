@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 1 * *"   # monthly: re-check against whatever tshark ships then
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: python -m pip install --upgrade pip && pip install -e ".[dev]"
+      - name: Tests
+        run: python -m pytest -q
+      - name: The demo capture is reproducible
+        run: |
+          python tools/make_demo.py
+          git diff --exit-code examples/demo.pcapng
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip && pip install -e ".[dev]"
+      - name: Ruff
+        run: ruff check .
+      - name: Mypy
+        run: mypy
+
+  fuzz:
+    name: fuzz (100k malformed inputs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip && pip install -e .
+      - run: python tools/fuzz.py --cases 100000 --jobs 4
+
+  install:
+    name: pip install from a clean environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build and install the wheel only
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+          cd /tmp
+          python -m venv clean
+          ./clean/bin/pip install "$GITHUB_WORKSPACE"/dist/*.whl
+          ./clean/bin/unspool --version
+          ./clean/bin/unspool summary "$GITHUB_WORKSPACE/examples/demo.pcapng"
+          ./clean/bin/python -c "import unspool; print(len(list(unspool.packets('$GITHUB_WORKSPACE/examples/demo.pcapng'))), 'packets')"
+
+  tshark:
+    name: agrees with tshark
+    # Downloads the Wireshark sample set, so it runs on request or monthly
+    # rather than on every push: the wiki should not be hammered by CI.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install tshark
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
+      - run: pip install -e .
+      - name: Compare against the committed manifest of sample captures
+        run: python tools/compare_tshark.py --download --delay 0.5
+      - name: Fail if any file disagrees for a new reason
+        run: git diff --stat compat/ || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compat-report
+          path: compat/

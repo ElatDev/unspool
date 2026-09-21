@@ -1,0 +1,8 @@
+# Text files are stored with LF and checked out as-is.
+* text=auto eol=lf
+
+# Capture files and the screenshot must never be line-ending converted.
+*.pcap binary
+*.pcapng binary
+*.gz binary
+docs/screenshot.svg -text
