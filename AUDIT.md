@@ -69,4 +69,4 @@ unspool parses capture files. It does **not** capture traffic. The capture half
 of the original tool needed `pktmon`, which needs administrator rights and only
 exists on Windows. Leaving it out means the project installs anywhere, needs no
 privileges and no driver, and cannot produce a file containing anyone's
-traffic — including mine. See the README's "Where it stops" section.
+traffic — including mine. See the README's "Limitations" section.

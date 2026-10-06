@@ -50,7 +50,7 @@ not, carried across.
 ### Notes
 
 - Parse-only by design: no capture, no sockets, no decryption, no reassembly
-  of IP fragments. See "Where it stops" in the README.
+  of IP fragments. See "Limitations" in the README.
 - No runtime dependencies, and none are planned.
 
 [0.1.0]: https://github.com/ElatDev/unspool/releases/tag/v0.1.0
